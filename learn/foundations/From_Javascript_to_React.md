@@ -1,6 +1,6 @@
-# From Javascript to React
+## From Javascript to React
 
-## Rendering User Interfaces
+### Rendering User Interfaces
 
 React의 동작을 이해하기 위해 어떻게 브라우저가 UI를 그리기 위해 우리의 코드를 해석하는지 기본 동작을 이해할 필요가 있다.
 
@@ -10,7 +10,7 @@ React의 동작을 이해하기 위해 어떻게 브라우저가 UI를 그리기
 
 브라우저는 HTML을 읽고 Document Object Model(DOM)을 생성한다.
 
-## What is the DOM?
+### What is the DOM?
 
 DOM은 HTML 요소를 표현하는 객체다. 코드와 UI 사이에 브릿지 역할을 하고 부모와 자식 요소가 있는 트리 자료구조 형태를 띄고 있다.
 
@@ -20,4 +20,4 @@ DOM 메서드와 Javascript와 같은 프로그램 언어를 사용해 유저 �
 
 다음 섹션에서 어떻게 이를 사용할 수 있는지 알아보자.
 
-[Next Lesson]()
+---
