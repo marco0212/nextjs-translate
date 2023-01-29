@@ -146,3 +146,109 @@ Javascript를 활용해서 DOM을 수정하는 것은 매우 강력하지만 장
 
 ---
 
+### Getting Started with React
+
+리액트를 프로젝트에서 사용하기 위해서는 [unpkg.com]() 라는 외부 사이트에서 React 스크립트를 로드해야 한다.
+
+- react 는 React의 핵심 라이브러리이다.
+- react-dom은 DOM에서 react를 사용할 수 있게 특정 메서드를 제공한다
+
+```html
+<!-- index.html -->
+<html>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+    <script type="text/javascript">
+      const app = document.getElementById('app');
+    </script>
+  </body>
+</html>
+```
+
+순수한 자바스크립트를 사용해 DOM을 조작하는 대신 ReactDOM.render() 메서드를 사용해 react에게 `<h1>` 타이틀을 #app 요소 안에 렌더링하게끔 할 수 있다.
+
+```html
+<!-- index.html -->
+<html>
+  <body>
+    <div id="app"></div>
+
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+
+    <script type="text/javascript">
+      const app = document.getElementById('app');
+      ReactDOM.render(<h1>Develop. Preview. Ship. 🚀</h1>, app);
+    </script>
+  </body>
+</html>
+```
+
+하지만 위 코드를 브라우저에서 실행하면 syntax 에러를 보게 된다.
+
+<img width="544" alt="image" src="https://user-images.githubusercontent.com/50050459/215333291-781c45b6-f1a8-4585-9871-4409be6ace13.png">
+
+
+왜냐하면 `<h1>...</h1>`은 유효한 자바스크립트 문법이 아니기 때문이다. 이런 코드를 JSX라고 부른다.
+
+### What is JSX?
+
+JSX는 HTML 문법과 유사하게 UI를 작성할 수 있는 자바스크립트의 확장 문법이다. JSX의 장점에 대해서는 다음([three JSX rules](https://beta.reactjs.org/learn/writing-markup-with-jsx#the-rules-of-jsx))를 확인하고, 지금은 HTML과 Javascript의 문법 외에는 학습할 필요가 없다.
+
+브라우저는 JSX를 인지하지 못하기 때문에 바벨 같은 컴파일러를 통해 JSX를 일반 자바스크립트 코드로 변환시켜주어야 한다.
+
+### Adding Babel to your project
+
+프로젝트에 바벨을 추가히기 위해서 아래 코드를 index.html 파일에 붙여넣자.
+
+```html
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+```
+
+바벨에 어떤 코드로 변환해야 할지 알려주기 위해 script 타입을 `type=text/jsx`로 변경하자.
+
+```html
+<html>
+  <body>
+    <div id="app"></div>
+    <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+    <!-- Babel Script -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script type="text/jsx">
+      const app = document.getElementById('app');
+      ReactDOM.render(<h1>Develop. Preview. Ship. 🚀</h1>, app);
+    </script>
+  </body>
+</html>
+```
+
+브라우저에서 제대로 동작하는지 확인해보자.
+
+선언적으로 작성한 React 코드와 명령적으로 작성한 이전 섹션의 코드를 비교해보자.
+
+```html
+<script type="text/jsx">
+  const app = document.getElementById("app")
+  ReactDOM.render(<h1>Develop. Preview. Ship. 🚀</h1>, app)
+</script>
+```
+
+```html
+<script type="text/javascript">
+  const app = document.getElementById('app');
+  const header = document.createElement('h1');
+  const headerContent = document.createTextNode('Develop. Preview. Ship. 🚀');
+  header.appendChild(headerContent);
+  app.appendChild(header);
+</script>
+```
+
+React를 사용해 반복되는 코드가 많이 제거되었음을 확인할 수 있다.
+
+> Note: React가 어떻게 UI를 변경하는지를 알 필요는 없지만 더 잘 이해하고 싶다면 [UI trees](https://beta.reactjs.org/learn/preserving-and-resetting-state#the-ui-tree)와 [render method](https://beta.reactjs.org/reference/react-dom/render)를 확인해보자.
+
