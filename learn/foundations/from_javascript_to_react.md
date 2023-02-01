@@ -270,3 +270,15 @@ javascript와 React를 동시에 배울 수도 있지만 javascript와 친숙해
 
 ---
 
+### React Core Concepts
+
+React를 활용해 웹 어플리케이션을 구현하는데 꼭 이해해야 하는 코어 개념이 몇가지 있다.
+
+- Components
+- Props
+- State
+
+다음 섹션에서 위의 개념들을 훑고 계속 이어 학습할 수 있을 자료들을 제공하겠다.
+
+---
+
