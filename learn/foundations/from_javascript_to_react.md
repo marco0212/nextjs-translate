@@ -252,3 +252,21 @@ React를 사용해 반복되는 코드가 많이 제거되었음을 확인할 �
 
 > Note: React가 어떻게 UI를 변경하는지를 알 필요는 없지만 더 잘 이해하고 싶다면 [UI trees](https://beta.reactjs.org/learn/preserving-and-resetting-state#the-ui-tree)와 [render method](https://beta.reactjs.org/reference/react-dom/render)를 확인해보자.
 
+### Essential Javascript for React
+
+javascript와 React를 동시에 배울 수도 있지만 javascript와 친숙해지는 것이 React를 배우는데 더 수월할 수 있다.
+
+다음 섹션에서 React의 핵심 개념에 대해 이야기할 것이다. 추후에 언급될 자바스크립트의 토픽은 아래와 같다.
+
+- Function and Arrow Function
+- Objects
+- Array and array methods
+- Descructuring
+- Template literals
+- Ternary Operators
+- [Es Modules and Import /Export Syntax](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
+
+이번 과정에서 Jvascript에 깊게 들어가지는 않지만 자바스크립트의 최신 버전을 유지하는 것은 도움이 될 것이다. 하지만 자바스크립트에 능숙하지 않다면 React를 이용해 웹을 만드는 것에 방해가 되지 않도록 해라.
+
+---
+
