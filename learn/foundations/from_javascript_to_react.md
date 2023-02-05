@@ -282,3 +282,569 @@ React를 활용해 웹 어플리케이션을 구현하는데 꼭 이해해야 �
 
 ---
 
+### Building UI with Components
+
+UI는 컴포넌트라고 불리는 작은 블록으로 쪼개질 수 있다.
+
+컴포넌트는 self-contained 되고, 재사용가능한 코드 snippet이다. 만약 컴포넌트를 레고 조각이라고 생각한다면 개별 요소를 더 큰 구조로 조합할 수 있다. 만약 UI 업데이트가 필요하면 특정 컴포넌트를 변경해 처리할 수 있다.
+
+<img width="668" alt="image" src="https://user-images.githubusercontent.com/50050459/216778503-2e811a33-2caa-4085-afb3-4d3e9d0567c3.png">
+
+이러한 모듈화는 프로젝트가 커짐에 따라 추가 및 수정에 다른 요소들의 touch 없이 더 쉽게 대응할 수 있다.
+
+React 컴포넌트의 좋은 점은 모든 컴포넌트는 단지 Javascript 라는 점이다. Javascript 관점에서 React 컴포넌트를 어떻게 작성할 수 있는지 알아보자.
+
+### Creating components
+
+React에서 컴포넌트는 그저 함수이다. script 태그 안에 Header하는 함수를 작성할 수 있다.
+
+```html
+<script type="text/jsx">
+  const app = document.getElementById("app")
+
+
+  function header() {
+  }
+
+  ReactDOM.render(<h1>Develop. Preview. Ship. 🚀</h1>, app)
+</script>
+```
+
+컴포넌트는 UI 엘리먼트를 반환하는 함수다. 함수의 반환문에 JSX를 작성할 수 있다.
+
+```html
+<script type="text/jsx">
+  const app = document.getElementById("app")
+
+  function header() {
+     return (<h1>Develop. Preview. Ship. 🚀</h1>)
+   }
+
+  ReactDOM.render(, app)
+</script>
+```
+
+DOM에 컴포넌트를 렌더링하기 위해서는 ReactDOM.render() 함수에 첫 번째 인자로 전달할 수 있다.
+
+```html
+<script type="text/jsx">
+
+  const app = document.getElementById("app")
+
+  function header() {
+     return (<h1>Develop. Preview. Ship. 🚀</h1>)
+   }
+
+
+   ReactDOM.render(header, app)
+</script>
+```
+
+하지만 위 코드를 브라우저에서 실행하면 에러를 확인할 수 있다. 이를 실행하기 위해서는 먼저 해야 할 것들이 있다.
+
+먼저 React 컴포넌트는 plain한 html와 구별하기 위해 첫 문자를 대문자로 작성해야 한다.
+
+```html
+function Header() {
+  return <h1>Develop. Preview. Ship. 🚀</h1>;
+}
+
+// Capitalize the React Component
+ReactDOM.render(Header, app);
+```
+
+둘째, 일반적인 html 사용처럼 꺽세 괄호를 사용해야 한다.
+
+```html
+function Header() {
+  return <h1>Develop. Preview. Ship. 🚀</h1>;
+}
+
+ReactDOM.render(<Header />, app);
+```
+
+### Nesting Components
+
+어플리케이션은 일반적으로 하나 이상의 컴포넌트를 포함한다. HTML 엘리먼트 안에 다른 요소를 포함하듯 React 엘리먼트를 중첩할 수 있다.
+
+이 예에서 HomePage 컴포넌트를 만들어보자.
+
+```html
+function Header() {
+  return <h1>Develop. Preview. Ship. 🚀</h1>;
+}
+
+function HomePage() {
+  return (
+    <div>
+      {/* Nesting the Header component */}
+      <Header />
+    </div>
+  );
+}
+
+ReactDOM.render(<Header />, app);
+```
+
+### Component Tree
+
+아래처럼 form 컴포넌트 트리를 중첩시킬 수 있다.
+
+<img width="670" alt="image" src="https://user-images.githubusercontent.com/50050459/216779050-45cc6e90-03fd-4ed4-b60c-6ee0da93e0c4.png">
+
+예에서 보듯이 HomePage 컴포넌트는 Header, Article, Footer 컴포넌트를 포함할 수 있다. 그리고 각 컴포넌트는 자신의 자식 컴포넌트를 차례로 가질 수 있다. 예로 Header 컴포넌트는 Logo, Title, Navigation 컴포넌트를 포함하고 있다.
+
+이런 모듈 형태는 어플리케이션 안의 다른 곳에서 재사용할 수 있도록 도와준다.
+
+프로젝트에서 HomePage는 Top level 컴포넌트이므로 ReactDom.render 메서드에 전달될 수 있다.
+
+```html
+unction Header() {
+  return <h1>Develop. Preview. Ship. 🚀</h1>;
+}
+
+function HomePage() {
+  return (
+    <div>
+      <Header />
+    </div>
+  );
+}
+
+ReactDOM.render(<HomePage />, app);
+```
+
+다음 섹션에서 prop과 이를 사용해 서로 다른 컴포넌트 간 데이터 전달이 어떻게 되는지 알아보도록 하자.
+
+---
+
+### Displaying Data with Props
+
+만일 Header 컴포넌트를 재사용한다면 이것은 같은 컨텐츠를 동시에 보여줄 것이다.
+
+```html
+function Header() {
+  return <h1>Develop. Preview. Ship. 🚀</h1>;
+}
+
+function HomePage() {
+  return (
+    <div>
+      <Header />
+      <Header />
+    </div>
+  );
+}
+```
+
+하지만 만일 다른 텍스트를 전달하고 싶거나 데이터를 외부에서 fetch 하기 때문에 어떤 데이터가 들어올지 미리 알 수 없다면 어쩔 것인가?
+
+일반적인 HTML 엘리먼트에서는 요소의 행동을 변경시킬 수 있는 attribute라는 data를 전달할 수 있다. 예를 들어 img 엘리먼트에 src 속성을 변경하므로 보이는 이미지를 변경할 수 있다. a 태그에 href를 변경하므로써 링크의 목적지를 변경할 수도 있다.
+
+이와 같게 React 컴포넌트에는 prop이라고 불리는 속성에 data를 전달할 수 있다.
+
+<img width="674" alt="image" src="https://user-images.githubusercontent.com/50050459/216779515-27885596-0b9a-4ec5-8597-f39eac11bccf.png">
+
+Javascript 함수와 유사하게 컴포넌트의 동작을 바꾸거나 스크린에 렌더링될 때 어떤 것이 보여야 할지에 대한 커스텀한 인자 컴포넌트를 설계할 수 있다.
+
+> Note
+> React에서 데이터 흐름은 컴포넌트 트리의 아래로 흐른다. 이를 단방향 데이터 흐름이라고 부른다. 상태는 부모 컴포넌트에서 prop으로 자식 요소들에게 전달된다.
+
+
+### Using props
+
+HomePage 컴포넌트에서 title 속성을 Header 컴포넌트에게 전달할 수 있다.
+
+```html
+// function Header() {
+//   return <h1>Develop. Preview. Ship. 🚀</h1>
+// }
+
+function HomePage() {
+  return (
+    <div>
+      <Header title="React 💙" />
+    </div>
+  );
+}
+
+// ReactDOM.render(<HomePage />, app)
+```
+
+자식 요소인 Header 컴포넌트는 함수의 첫 번째 인자 prop으로 받을 수 있다.
+
+```html
+function Header(props) {
+//   return <h1>Develop. Preview. Ship. 🚀</h1>
+// }
+
+// function HomePage() {
+//   return (
+//     <div>
+//       <Header title="React 💙" />
+//     </div>
+//   )
+// }
+
+// ReactDOM.render(<HomePage />, app)
+```
+
+만약 prop을 console.log로 찍어본다면 title 속성을 가진 객체를 확인할 수 있을 것이다.
+
+```html
+function Header(props) {
+    console.log(props) // { title: "React 💙" }
+//   return <h1>React 💙</h1>
+// }
+
+// function HomePage() {
+//   return (
+//     <div>
+//       <Header title="React 💙" />
+//     </div>
+//   )
+// }
+
+// ReactDOM.render(<HomePage />, app)
+```
+
+Prop은 객체이기 때문에 이름을 명시적으로 보이게 하기 위해서 함수의 인자안에서 object descructuring할 수 있다.
+
+```html
+function Header({ title }) {
+    console.log(title) // "React 💙"
+//  return <h1>React 💙</h1>
+// }
+
+// function HomePage() {
+//   return (
+//     <div>
+//       <Header title="React 💙" />
+//     </div>
+//   )
+// }
+
+// ReactDOM.render(<HomePage />, app)
+```
+
+그리고 title을 h1 태그로 변환할 수 있다.
+
+```html
+function Header({ title }) {
+  console.log(title);
+  return <h1>title</h1>;
+}
+```
+
+만일 브라우저에서 프로젝트를 연다면 title이라는 실제 단어가 보이는 것을 확인할 수 있을 것이다. 왜나하면 React는 plain 텍스트를 렌더링하는 것을 의도로 파악했을 것이기 때문이다.
+
+React에게 Javascript 변수를 표시할 방법이 필요한다.
+
+### Using Variables JSX
+
+선언한 변수를 사용하기 위해서는 javascript를 jsx 안에서 바로 사용할 수 있도록 하는 특별한 JSX 문법 중괄호를 사용해야 한다.
+
+```js
+// function Header({title}) {
+//  console.log(title)
+return <h1>{title}</h1>;
+// }
+```
+
+중괄호를 JSX land에서 Javascript land에 들어가는 길이라고 생각해도 된다. 이 안에 Javascript 문 어떤 것이든 넣을 수 있다.
+
+1. dot notation을 사용한 객체의 속성
+
+```js
+function Header(props) {
+  return <h1>{props.title}</h1>;
+}
+```
+
+2. 템플릿 리터럴
+
+```js
+function Header({ title }) {
+  return <h1>{`Cool ${title}`}</h1>;
+}
+```
+
+3. 함수의 반환값
+
+```js
+function createTitle(title) {
+  if (title) {
+    return title;
+  } else {
+    return 'Default title';
+  }
+}
+
+function Header({ title }) {
+  return <h1>{createTitle(title)}</h1>;
+}
+```
+
+4. 삼항 연산자
+
+```js
+function Header({ title }) {
+  return <h1>{title ? title : 'Default Title'}</h1>;
+}
+```
+
+title prop으로 어떤 문자열도 전달할 수 있게 되었다. 물론 삼항 연산자를 통해 default 케이스도 대응했기 때문에 아무런 prop을 전달하지 않아도 된다.
+
+```js
+function Header({ title }) {
+  return <h1>{title ? title : 'Default title'}</h1>;
+}
+
+function HomePage() {
+  return (
+    <div>
+      <Header />
+    </div>
+  );
+}
+```
+
+컴포넌트는 이제 어플리케이션에서 다르게 재사용될 수 있도록 하는 Prop을 받을 수 있게 되었다.
+
+```html
+function HomePage() {
+  return (
+    <div>
+      <Header title="React 💙" />
+      <Header title="A new title" />
+    </div>
+  );
+}
+```
+
+### Iterating through lists
+
+데이터를 목록 형태로 보여주는 것은 일반적인 케이스이다. 배열 메서드를 이용해서 데이터를 가공하거나 동일한 스타일이지만 다른 정보를 포함하고 있는 UI 요소를 생성하는 것을 할 수 있다.
+
+> Note: React는 데이터 패칭에 대해서는 unopinionated 하기 때문에 당신에게 적합한 최적의 솔루션을 선택하도록 한다. 추후에 next.js의 데이터 fetching에 대해 논의할 것이다. 하지만 지금은 간단한 배열 데이터를 사용할 것이다.
+
+이름을 가진 배열을 HomePage 컴포넌트에 추가하자.
+
+```js
+function HomePage() {
+  const names = ['Ada Lovelace', 'Grace Hopper', 'Margaret Hamilton'];
+
+  return (
+    <div>
+      <Header title="Develop. Preview. Ship. 🚀" />
+    </div>
+  );
+}
+```
+
+array.map() 메서드를 활용해서 이름 요소를 list item으로 매핑할 수 있다.
+
+```js
+function HomePage() {
+  const names = ['Ada Lovelace', 'Grace Hopper', 'Margaret Hamilton'];
+
+  return (
+    <div>
+      <Header title="Develop. Preview. Ship. 🚀" />
+      <ul>
+        {names.map((name) => (
+          <li>{name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+중괄호를 사용해서 javascript와 jsx land를 어떻게 오갔는지 확인해라.
+
+만약 이 코드를 실행시킨다면 React는 key prop이 없다고 경고할 것이다. 왜냐하면 React는 업데이트할 list item의 알기 위해 유일한 식별할 수 있는 것을 필요로 하기 때문이다.
+
+지금의 경우에는 모두 유일한 값이기 때문에 name을 사용해도 괜찮지만 item의 id와 같은 유일함이 보장되는 값을 사용하는 것을 권장한다.
+
+```js
+function HomePage() {
+  const names = ['Ada Lovelace', 'Grace Hopper', 'Margaret Hamilton'];
+
+  return (
+    <div>
+      <Header title="Develop. Preview. Ship. 🚀" />
+      <ul>
+        {names.map((name) => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+다음 Section에서 상태에 대해서 알아보고 어떻게 유저 이벤트를 listen하는지 알아보자.
+
+---
+
+### Adding Interactivity with State
+
+React가 어떻게 상호작용을 도와주는지 알아보자.
+
+HomePage 컴포넌트 안에 like button을 추가해보자. 먼저 return 문 안에 button 엘리먼트를 추가하자.
+
+```js
+function HomePage() {
+  const names = ['Ada Lovelace', 'Grace Hopper', 'Margaret Hamilton'];
+
+  return (
+    <div>
+      <Header title="Develop. Preview. Ship. 🚀" />
+      <ul>
+        {names.map((name) => (
+          <li key={name}>{name}</li>
+        ))}
+      </ul>
+
+      <button>Like</button>
+    </div>
+  );
+}
+```
+
+### Listening to Events
+
+클릭할 때 무언가를 하게 만들기 위해서 onClick 이벤트를 만들 수 있다.
+
+```js
+function HomePage() {
+  // ...
+  return (
+    <div>
+      {/* ... */}
+      <button onClick={}>Like</button>
+    </div>
+  );
+}
+```
+
+리엑트에서 이벤트 이름은 카멜 케이스다. onClick 이벤트는 UI에서 반응할 수 있도록 하는 많은 이벤트 중 하나이다. input의 onChange나 form의 onSubmit 과 같이 말이야.
+
+### Handling Events
+
+이벤트가 trigger 될 때 호출될 핸들러 함수를 정의할 수 있다. return 문 이전에 handleClick 함수를 만들어보자.
+
+```js
+function HomePage() {
+  //    ...
+  function handleClick() {
+    console.log('increment like count');
+  }
+
+  return (
+    <div>
+      {/* ... */}
+      <button onClick={handleClick}>Like</button>
+    </div>
+  );
+}
+```
+
+### State and Hooks
+
+React는 Hook이라는 함수를 제공한다. Hook은 상태와 같은 로직을 추가할 수 있도록 한다. 상태는 UI에 있는 상태로 일반적으로 유저의 상호작용에 의해 시간이 지남에 따라 변경된다. 
+
+<img width="673" alt="image" src="https://user-images.githubusercontent.com/50050459/216797894-a30e2956-85bc-417b-841d-5a5e1efe67de.png">
+
+상태는 값을 저장하고 유저가 like 버튼을 클릭한 횟수를 올릴 수 있도록 사용될 수 있다. 상태를 관리할 수 있는 React Hook은 useState로 호출될 수 있다.
+
+```js
+function HomePage() {
+  React.useState();
+}
+```
+
+useState는 배열을 반환한다. 그리고 배열의 각 요소는 배열 destructuring을 통해 컴포넌트 안에서 접근 및 사용될 수 있다.
+
+```js
+function HomePage() {
+  const [] = React.useState();
+
+  // ...
+}
+```
+
+배열의 첫번째 요소는 상태값이다. 이름은 어떤 것이든 될 수 있다. 다만 서술적으로 짓기를 권장한다.
+
+```js
+function HomePage() {
+  const [likes] = React.useState();
+
+  // ...
+}
+```
+
+두번째 아이템은 update하는 함수이다. 이것 또한 이름을 아무렇게 지어도 되지만 업데이트하려는 변수의 이름 앞에 prefix로 set을 붙이는 것이 일반적이다.
+
+```js
+function HomePage() {
+  const [likes, setLikes] = React.useState();
+
+  // ...
+}
+```
+
+또한 like의 초기 상태값을 0으로 설정할 수 있다.
+
+```js
+function HomePage() {
+  const [likes, setLikes] = React.useState(0);
+}
+```
+
+그리고는 상태가 잘 동작하는지 컴포넌트 안에서 값을 사용해볼 수 있다.
+
+```js
+function HomePage() {
+  // ...
+  const [likes, setLikes] = React.useState(0);
+
+  return (
+    // ...
+    <button onClick={handleClick}>Like({likes})</button>
+  );
+}
+```
+
+state update 함수를 호출할 수 있기 때문에 이전에 정의했던 handleClick 함수에 이를 추가할 수 있다.
+
+```js
+function HomePage() {
+  // ...
+  const [likes, setLikes] = React.useState(0);
+
+  function handleClick() {
+    setLikes(likes + 1);
+  }
+
+  return (
+    <div>
+      {/* ... */}
+      <button onClick={handleClick}>Likes ({likes})</button>
+    </div>
+  );
+}
+```
+
+버튼을 클릭하게 되면 setLikes 함수에 현재 like + 1 이 인자로 전달되어 handleClick 함수를 실행하게 된다.
+
+> Note: 컴포넌트 함수의 첫번째 인자로 전달되는 Prop과는 다르게 상태는 컴포넌트 안에서 초기화되고 사용된다. 상태를 자식 컴포넌트에게 prop으로 전달할 수 있지만 상태를 업데이트 하는 로직은 초기화된 컴포넌트에 유지되어야 한다.
+
+### Managing State
+
+이는 상태에 대한 소개에 불과하다. 상태를 관리하고 데이터 흐름을 관리하는 것에 대해 학습할 수 있는 것은 매우 많이 있다. 더 나가가기 위해서 react 문서의 Adding [interactivity](https://beta.reactjs.org/learn/adding-interactivity)와 [Managing State](https://beta.reactjs.org/learn/managing-state)로 가보기를 추천한다
+
+
+
+
