@@ -845,6 +845,31 @@ function HomePage() {
 
 이는 상태에 대한 소개에 불과하다. 상태를 관리하고 데이터 흐름을 관리하는 것에 대해 학습할 수 있는 것은 매우 많이 있다. 더 나가가기 위해서 react 문서의 Adding [interactivity](https://beta.reactjs.org/learn/adding-interactivity)와 [Managing State](https://beta.reactjs.org/learn/managing-state)로 가보기를 추천한다
 
+---
+
+### How to continue learning React
+
+Component, props, state 리액트의 핵심 개념을 알아보았다. 이 강력한 기초는 React 어플리케이션을 구현하는데 도움이 될 것이다. 자신감이 생긴다면 다음 토픽에 대해서도 확인해보자
+
+- [How to React handles render]() 그리고 [How to use refs]()
+- [How to manage state]()
+- [How to use context for deeply nested data]()
+- [How to use React API hooks]() such as useEffect()
+
+### React Resources
+
+여러 해에 걸쳐 많은 강의, 비디오, 아티클들이 React를 배우는 개발자들을 위해 만들어졌다. 배우기에 적합한 한가지 자료를 추천하는 것은 어렵지만 귀중한 레퍼런스는 [React Documentation]()이다. 토픽을 연습할 수 있는 sandbox를 제공한다.
+
+React를 배우기 위해서 가장 좋은 방법은 구현하며 배우는 것이다. script 를 활용해 점진적으로 React를 적용시킬 수 있다. 그러나 많은 개발자는 React가 바로 시작하고 작성할 수 있을만큼 충분한 가치가 있음을 발견했다.
+
+### From React to Next.js
+
+React는 UI를 구축하는데 탁월하지만 독립적인 UI를 어플리케이션으로 만들기 위해서는 약간의 추가 작업이 필요하다. 좋은 소식은 next.js가 초기 설정과 추가 기능을 다뤄준다는 것이다.
+
+다음에 우리는 React를 next.js로 마이그레이션해볼 것이다.
+
+---
+
 
 
 
