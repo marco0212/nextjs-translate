@@ -1,0 +1,40 @@
+# How Next.js Works
+
+Next.js의 심화된 기능들을 배우기 이전에, Next.js가 어떻게 동작하는지 이해하는 것은 도움이 될 것이다.
+
+이 코스의 도입에 React가 어플리케이션을 빌드하고 구조화하는데 상대적으로 덜 의견이 있다는 것을 이야기했다. Next.js는 어플리케이션을 구조화하고 개발과정과 프로덕션 과정에 최적화를 할 수 있는 Framework를 제공한다. 
+
+다음 섹션에서 각각의 다른 스테이지 동안 어플리케이션 코드에 어떤 일들이 일어나는지 알아볼 것이다.
+
+- Development와 Production 중 어디서 실행되는지에 따라
+- BuildTime과 RunTime 중 언제 실행되는지에 따라
+- Client와 Server 중 어디서 실행되는지에 따라
+
+이런 개념과 Next.js가 뒷단에서 어떻게 동작하는지에 대해 깊이 알아보자.
+
+---
+
+Development and Production Environments
+
+environments라면 코드가 실행되는 컨텍스트라고 생각해도 된다.
+
+Develoment 동안에는 어플리케이션을 로컬 머신에서 빌드하고 실행시킨다. Production은 어플리케이션을 배포할 준비하고 유저가 사용할 수 있게 준비하는 과정이다.
+
+## How this applies to Next.js
+
+Next.js는 개발 환경과 프로덕션을 위한 기능을 모두 제공한다.
+
+- 개발 환경에서는 개발자와 어플리케이션을 만드는 개발 경험을 위해 최적화한다. Typescript나 Eslint 연동, Fast Refresh와 같이 개발 경험을 증진 시키는 것을 목적으로 한 기능들이 있다.
+- 프로덕션 환경에서는 실제 사용자를 위한 코드의 성능을 더 좋게하거나 접근성을 높이는 최적화가 이뤄진다.
+
+각 환경은 서로 다른 고려 사항과 목적이 있기 때문에 개발에서 프로덕션으로 바꾸기 위해서는 많은 것들이 이뤄져야 한다. 예로 이 코드들은 compiled, bundled, minified, code split 되어야 한다.
+
+## The Next.js Compiler
+
+Next.js는 대부분의 코드 변환과 밑단의 인프라를 프로덕션으로 바꾸기 쉽게 다룬다.
+
+Next.js는 Rust라는 low-level 언어로 된 컴파일러를 가지고 있고 SWC라는 컴파일과 minification, bundling에 사용되는 platform이 있기 때문에 가능하다.
+
+다음 섹션에서 이런 변환에 대해 알아보자.
+
+---
