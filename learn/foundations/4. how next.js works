@@ -38,3 +38,176 @@ Next.js는 Rust라는 low-level 언어로 된 컴파일러를 가지고 있고 S
 다음 섹션에서 이런 변환에 대해 알아보자.
 
 ---
+
+## What is Compiling?
+
+개발자는 사람에게 더 친숙한 JSX, Typescript, 모던 자바스크립트 언어로 코드를 작성한다. 이런 언어들은 생산성과 개발 시의 안정감을 제공하지만, 브라우저가 이해할 수 있도록 자바스크립트로 변환되어야 한다.
+
+컴파일링은 코드를 다른 언어 혹은 다른 버전의 언어로 변환하는 과정을 의미한다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/3b180d42-f1a2-4002-a143-2416b9830c41/Untitled.png)
+
+컴파일 과정은 개발 환경에서 코드를 수정할 때와 빌드할 때 일어난다.
+
+---
+
+## What is Minifying?
+
+개발자는 사람에게 친숙한 형태로 코드를 작성한다. 이 코드들은 주석이나 공백 같은 실행에 불필요한 것들을 포함하고 있다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/2b8a90df-05b7-4c2c-bc55-406ae79be79c/Untitled.png)
+
+Minification은 코드의 기능 변경 없이 불필요한 코드 형식이나 주석을 제거하는 과정이다. 이 과정의 목적은 파일 사이즈를 줄여 어플리케이션의 성능을 개선시키는 것이다.
+
+Next.js에서 자바스크립트와 CSS 파일은 프로덕션을 위해 자동으로 이루어진다.
+
+---
+
+## What is Bundling?
+
+개발자는 어플리케이션을 더 큰 응용 프로그램을 구축하는데 사용할 수 있는 모듈과 컴포넌트, 그리고 함수로 분해한다. 내부 모듈 뿐 아닌 서드 파티 라이브러리를 exporting과 importing하는 것은 복잡한 의존성을 만들어 낸다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e5b9880d-b9ed-4f51-ba21-bd42e9d1e9ad/Untitled.png)
+
+번들링은 의존성을 해결하고 유저가 웹 페이지에 접근할 때 파일 요청 수를 줄일 수 있도록 파일을 병합하는 과정이다.
+
+---
+
+## What is Code Spliting?
+
+일반적으로 다른 URL로 접근할 수 있도록 어플리케이션을 여러 페이지로 분리한다. 이런 각 페이지들은 어플리케이션의 유일한 진입점이 된다.
+
+코드 스플리팅은 어플리케이션의 번들을 각 진입점에서 필요로 하는 더 작은 chunk로 분리하는 과정이다. 이 과정의 목적은 페이지를 실행하는데 꼭 필요로 하는 코드만 로드해서 어플리케이션의 초기 로딩 시간을 개선하는데 있다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/4956798a-6bba-4b10-997b-0fe95e6e5498/Untitled.png)
+
+Next.js는 자체적으로 코드 스플리팅을 지원한다. pages/ 디렉토리에 존재하는 각각 파일들은 빌드될 때 own javascript bundle로 자동으로 spliting된다.
+
+Further
+- 페이지 간에 공유하는 모든 코드는 재다운로드를 피아기 위해 별개의 번들로 스플리팅된다.
+- 초기 페이지가 로드된 이후에 Next.js는 유저가 다른 페이지로 이동하기 직전에 pre loading을 시작할 수 있다.
+- Dynamic import는 초기에 로드되는 코드를 수동으로 스플리팅할 수 있는 방법이다.
+
+---
+
+## Built Time and Runtime
+
+Build time은 프로덕션을 위한 어플리케이션 코드를 준비하는 과정이라 그렇게 이름이 지어졌다.
+
+어플리케이션을 빌드할 때, Next.js는 코드를 프로덕션에서 서버에 배포되고 유저에 의해 사용될 수 있도록 알맞게 최적화되도록 변환한다.
+이때 아래 파일들을 포함한다.
+
+- 정적으로 페이지를 위한 HTML 
+- 서버에서 렌더링 할 수 있는 자바스크립트 파일
+- 클라이언트에서 페이지에 인터렉션할 수 있게 하는 자바스크립트 파일
+- CSS 파일
+
+런타임은 어플리케이션이 빌드 혹은 배포된 이후 유저의 요청에 따라 어플리케이션이 응답할 때를 의미한다.
+
+다음으로 client와 server 그리고 렌더링에 대해 알아보자.
+
+---
+
+## Client and Server
+
+클라이언트는 어플리케이션 코드에 의해 서버에 요청을 보내는 브라우저를 의미한다. 그러면 서버로 부터 받은 응답을 유저가 상호작용 할 수 있는 인터페이스로 바꾼다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e3616c4c-c8bd-4d94-a612-cf238da52182/Untitled.png)
+
+서버는 어플리케이션 코드를 저장하고 클라이언트로 부터 요청을 받고, 연산을 하며 응답을 되돌려주는 데이터 센터에 있는 컴퓨터를 의미한다.
+
+---
+
+## What is Rendering?
+
+React로 작성한 코드를 HTML로 변환하기 위한 꼭 필요한 과정이 있다. 이를 렌더링이라고 한다.
+
+렌더링은 서버에서 이뤄질 수도, 클라이언트에서 이뤄질 수도 있다. 이것은 빌드 타임 이전에 발생할 수도, 모든 런타임의 요청에도 발생할 수도 있다.
+
+Next.js에서는 Server-Side-Rendering, Static Site Generation, Client-Side Rendering 등 세가지 타입의 렌더링이 가능하다.
+
+### Pre-Rendering
+
+서버 사이드 렌더링과 정적 생성은 Pre-Rendering으로 분류된다. 클라이언트에 전달되기 이전에 외부 데이터를 불러오고 React 코드를 HTML로 변환하기 때문이다.
+
+### Client-Side Rendering vs. Pre-Rendering
+
+표준 리액트 어플리케이션에서 브라우저는 빈 HTML와 UI를 구축하기 위한 자바스크립트를 서버로 부터 전달받는다. 이는 유저의 디바이스에서 초기 렌더링이 발생되기 때문에 클라이언트 사이드 렌더링이라고 불린다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/c5f46701-5537-4c20-9006-7814f35291c8/Untitled.png)
+
+> Note: Next.js 어플리케이션에서는 리엑트의 useEffect나 useSWR를 사용해서 특정 컴포넌트를 클라이언트 사이드 렌더링으로 선택할 수 있다.
+
+이와 대조적으로 Next.js는 모든 페이지를 기본적으로 pre rendering 한다. pre-rendering이란 유저 디바이스에서 자바스크립트에 의해 처리되는 것이 아닌 서버에서 HTML을 생성하는 것을 의미한다.
+
+실제로 완전한 클라이언트 사이드 렌더링 앱의 경우 렌더링 작업이 수행되는 동안 사용자에게 빈페이지가 표시됨을 의미합니다. 사용자가 구성된 HTML을 볼 수 있는 pre-rendering과 비교하면 아래와 같다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/d9f4c31b-24cc-49e9-804c-afa167fad259/Untitled.png)
+
+이제 두가지 타입의 pre-rendering에 대해 알아보자.
+
+###Server-Side-Rendering
+
+서버 사이드 렌더링에서 HTML은 각 요청에 따라 서버에 의해 만들어진다. 만들어진 HTML, JSON, 페이지를 상호작용하게 하는 Javascript는 클라이언트로 보내진다.
+
+클라이언트에서 React가 JSON 데이터와 Javscript로 인터렉션이 가능하게 만드는 동안 HTML은 인터렉션이 불가능한 상태로 보여진다. 이 과정을 hydration이라고 한다.
+
+Next.js에서는 getServerSideProps를 사용해서 서버 사이드 렌더링을 할 수 있다.
+
+> Note: React18과 Next 12는 React Server component를 소개했다. Server Component는 서버에 의해 완전히 렌더링되고 클라이언트 Javascript를 필요로 하지 않는다. 게다가 Server Component는 일부 로직을 서버에 유지하고 로직의 결과만 클라이언트에 보낼 수 있다. 이는 클라이언트에 보낼 bundle 사이즈를 줄이고 렌더링 성능을 높인다.
+
+### Static Site Generation
+
+정적 사이트 생성을 사용하면 HTML은 서버에서 만들어지지만 서버 사이드 렌더링과 다르게 런타임에 서버가 없다. 대신 컨텐츠는 빌드타임에 한번 생성되고 어플리케이션이 배포될 때 HTML이 CDN에 저장되고 매 요청마다 재사용된다.
+
+Next.js에서 getStaticProps를 통해 정적 생성을 사용할 수 있다.
+
+> Note: 사이트를 빌드한 이후에 페이지를 생성하거나 업데이트하기 위해서 incremental Static Regeneration을 사용할 수 있다. 이 말은 만일 데이터가 변경되었을 때 모든 사이트를 다시 빌드할 필요가 없다는 것을 의미한다.
+
+Next.js의 좋은 점은 상황에 따라 페이지 별로  서버 사이드 렌더링, 정적 사이트 생성, 클라이언트 렌더링을 사용할 수 있다는 것이다. 어떤 렌더링 방식이 특정 케이스에 적합한지는 [data fetching docs]()를 확인하기 바란다.
+
+다음 섹션에서 코드가 어디에 저장될 수 있고 배포될 수 있는지를 알아보자
+
+---
+
+## What is the Network?
+
+어플리케이션 코드가 저장되고 실행되는 위치를 아는 것은 도움이 된다. 네트워크는 자원을 공유할 수 있게 연결된 컴퓨터로 생각해도 된다. Next.js에서 어플리케이션은 origin server와 CDN 그리고 Edge에 분산된 수 있다.
+
+### Origin Servers
+
+이전에 논의한 것처럼 서버는 저장하고 어플리케이션 코드를 실행하는 컴퓨터를 의미한다.
+
+origin이라는 용어는 CDN이나 Edge server 같은 다른 어플리케이션 코드가 위치하는 곳과 구별하기 위해 사용한다.
+
+### Content Delivery Network
+
+CDN은 전 세계 여러 위치에 정적 컨텐츠를 저장하고 클라이언트와 원본 서버 사이에 배치 된다. 새로운 요청이 들어오면 사용자에게 가장 가까운 CDN 위치가 캐시된 결과로 응답한다.
+
+![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/bf72ebd8-b9a8-4047-b38a-53f705a2db28/Untitled.png)
+
+이것은 origin의 부화를 줄여준다. 계산이 각 요청에서 발생할 필요가 없기 때문이다. 이는 또한 지리적으로 더 가깝게 있기 때문에 유저에게 더 빠르게 전달될 수 있다.
+
+Next.js에서 pre-rendering은 사전에 미리 수행할 수 있고 CDN은 정적 결과를 저장하는데 적합하기 때문에 컨텐츠의 전달 속도를 빠르게 할 수 있다.
+
+### The Edge
+
+엣지는 사용자게에 가장 가까운 네트워크 주변부에 대한 일반화된 개념이다. CDN은 네트워크의 프린지에 정적 컨텐츠를 저장하기 때문에 엣지의 일부로 간주될 수 있다.
+
+CDN과 유사하게 엣지는 여러 위치 곳곳에 분산될 수 있다. 하지만 정적 컨텐츠를 저장하는 CDN과 다르게 작은 snippet의 코드를 실행할 수 있다.
+
+이는 캐싱과 코드 실행 모두 사용자에게 더 가까운 엣지에서 수행할 수 있음을 의미한다.
+
+전통적으로 클라이언트 혹은 서버에서 수행되던 일부 작업을 엣지로 이동시키면 클라이언트로 전송될 코드의 양이 줄어들고 사용자의 요청 모두가 처리될 필요가 없기 때문에 어플리케이션의 성능을 높일 수 있습니다.
+
+Next.js에서는 Middleware와 React Server Component를 통해 코드를 엣지에서 실행할 수 있다.
+
+---
+
+Next Steps
+
+Next.js 파운데이션을 모두 마친 것을 축하합니다.
+
+Next.js를 더 배우기 위해서 create your first Next.js app을 추천합니다.
+
+🚀
