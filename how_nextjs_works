@@ -1,0 +1,86 @@
+# How Next.js works
+
+before you learn advanced next.js features it would be helpful to understand the basics of how next.js works
+
+react is relatively opinionated about how you build and structure your applications.
+
+next.js provides a framework to structure and optimization both development and production.
+
+## Development and Production Environments
+
+environments means context that code is running.
+
+during development, your code will be running and build on local machine.
+
+going production is process that you make code to ready to be deployed and consumed by users.
+
+## Provided features by Next.js on Environments
+
+- in development, aims to developers, next.js optimizes to build your applications.
+  - typescript
+  - eslint
+  - fast refresh
+  - and more...
+
+- in production, aims to end users, next.js optimizes transform the code to make it performant and accessible.
+
+since each environment has different considerations and goals, there is a lot that needs to be done between environments.
+
+## The Next.js Compiler
+
+next.js handles much of these code transformations and underlying infrastructure to make it easier to go to production.
+
+Next.js compiler is written in Rust and SWC. they can be used for compilation, minification, bundling and more.
+
+## What is Compiling?
+
+browser can understand only javascript. but developer writes code languages that are more developer-friendly such as JSX, Typescript and modern version of javascript. they need to be transformed to browser understands. this process is compiling.
+
+in next.js compilation happens during edit your code in development, and build step.
+
+## What is Minifying?
+
+in development, we write code human-friendly. such as name of variables, spaces and comments. minification is the process of removing unnecessary code formatting without changing the code functionality. the goal is to improve the application's performance by decreasing file sizes.
+
+## What is Bundling?
+
+bundling is the process of resolving the dependencies and merging files into optimized bundles for browser. the goal of reducing the number of requests for files
+
+## What is Code Splitting?
+
+code splitting is the process of  splitting the application's bundle into smaller chunks required by each entry point. the goal is to improve the application's initial load time by loading the code required to run that page.
+
+## What is Build time?
+
+build time is series of steps that prepare application code for production. next.js will transform code into production optimized files ready to be deployed. these files include:
+
+- HTML files for statically generated
+- Javascript code for rendering on the server
+- Javascript code for making interaction on the client
+- CSS files
+
+## What is Runtime?
+
+runtime (or request time) refers to the period of time when your application runs in response ot a user's request.
+
+## What is Rendering?
+
+converting react code you write into html is rendering. rendering can take place on the server or client. it can happen either build time or every request at runtime.
+
+next.js provides three types of rendering ways: server-side rendering, static site generation and client-side rendering.
+
+## What is Pre-rendering?
+
+SSR and static site generation are referred to as Pre-rendering because the fetching of external data and transformation of react components into html happens before the result is send to the client.
+
+## What is Server-side rendering (one of type pre-rendering)
+
+with server-side rendering, the HTML is generated on a server for each request.
+
+> react 18 and next 12 introduce server components as version of alpha. basically component should be rendered as dump interact nothing. but server component is completely rendered by server. so it doesn't need other code to hydrate. this reduces the bundle size because server has the logic.
+
+## What is Static Site Generation (one of type pre-rendering)
+
+with static site generation, the html is generated on the server, but unlike SSR, there is no server at runtime. instead, content is generated once, at build time, when the application is deployed.
+
+## What is the Network?
