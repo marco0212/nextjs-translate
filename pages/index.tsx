@@ -4,7 +4,7 @@ import { fetchPosts } from "../libs/rest-api/posts";
 function HomePage({ posts }) {
   return (
     <div>
-      <h1>Welcome Home Page</h1>
+      <h1>Fucking Welcome Home Page</h1>
       <ul>
         {posts.map((post) => (
           <li key={post.id}>
