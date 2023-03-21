@@ -1,0 +1,26 @@
+import { Meta, Canvas, Story, Title } from "@storybook/addon-docs";
+import { Loading } from "./";
+
+<Meta title="shared-ui/Loading" />
+
+# Loading
+
+Placeholder UI로 데이터를 불러오는 중에 사용됩니다.
+
+<Canvas>
+  <Loading />
+</Canvas>
+
+### Props
+
+### message
+
+Loading 컴포넌트는 message 값을 prop으로 전달 받을 수 있습니다. message 값은 컴포넌트에 텍스트로 대체됩니다.
+
+<Canvas>
+  <div>
+    <Loading message="Please wait" />
+    <Loading message="잠시만 기다려 주세요" />
+    <Loading message="싫으면 나가든지" />
+  </div>
+</Canvas>
