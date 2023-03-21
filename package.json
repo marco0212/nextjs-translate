@@ -1,0 +1,24 @@
+{
+  "name": "sample-next",
+  "version": "1.0.0",
+  "description": "sample next.js application to practice configrations about infrastructures",
+  "main": "index.js",
+  "author": "marco0212",
+  "license": "MIT",
+  "dependencies": {
+    "next": "^13.2.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "devDependencies": {
+    "@types/node": "18.15.5",
+    "@types/react": "18.0.28",
+    "typescript": "5.0.2"
+  }
+}
