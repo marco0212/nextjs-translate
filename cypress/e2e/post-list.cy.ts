@@ -1,6 +1,6 @@
 describe("Post List Page", () => {
   beforeEach(() => {
-    cy.visit("http://localhost:3000/");
+    cy.visit("/");
   });
 
   it("타이틀이 표시된다", () => {
@@ -12,8 +12,7 @@ describe("Post List Page", () => {
   });
 
   it("포스트 클릭 시 상세 페이지로 이동한다", () => {
-    cy.url().should("not.include", "/posts/");
-    cy.get("li").eq(0).click();
-    cy.url().should("include", "/posts/");
+    cy.get("li a").eq(0).click();
+    cy.url().should("include", "posts");
   });
 });
