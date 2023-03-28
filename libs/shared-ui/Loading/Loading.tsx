@@ -1,5 +1,4 @@
 import { FC, useEffect, useRef, useState } from "react";
-import { Meta } from "@storybook/addon-docs";
 
 const MAX_DOT_LENGTH = 3;
 
@@ -8,7 +7,7 @@ type LoadingProps = {
 };
 
 export const Loading: FC<LoadingProps> = ({ message }) => {
-  const [dots, setDots] = useState("");
+  const [dotLength, setDotLength] = useState(0);
   const timer = useRef<NodeJS.Timer | null>(null);
 
   useEffect(() => {
@@ -17,8 +16,8 @@ export const Loading: FC<LoadingProps> = ({ message }) => {
     }
 
     timer.current = setInterval(() => {
-      setDots((prev) => {
-        return prev.length === MAX_DOT_LENGTH ? "" : prev + ".";
+      setDotLength((prev) => {
+        return prev === MAX_DOT_LENGTH ? 0 : prev + 1;
       });
     }, 500);
 
@@ -30,7 +29,7 @@ export const Loading: FC<LoadingProps> = ({ message }) => {
   return (
     <div>
       {message?.trim() || "Loading"}
-      {dots}
+      <span>{new Array(dotLength).fill(null).map(() => ".")}</span>
     </div>
   );
 };
