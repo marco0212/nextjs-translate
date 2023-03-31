@@ -6,6 +6,8 @@ type LoadingProps = {
   message?: string;
 };
 
+console.log("hello?");
+
 export const Loading: FC<LoadingProps> = ({ message }) => {
   const [dotLength, setDotLength] = useState(0);
   const timer = useRef<NodeJS.Timer | null>(null);
