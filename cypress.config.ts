@@ -1,6 +1,7 @@
 const { defineConfig } = require("cypress");
 
-module.exports = defineConfig({
+export default defineConfig({
+  projectId: "q21rfb",
   component: {
     devServer: {
       framework: "next",
