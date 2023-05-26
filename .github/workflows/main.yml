@@ -29,7 +29,6 @@ jobs:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
           SLACK_USERNAME: 배포에 실패해 슬픈 페페
           SLACK_ICON_EMOJI: ":sadpepe:"
-          SLACK_COLOR: yellow
-          SLACK_TITLE: 이것은 타이틀입니다.
-          SLACK_MESSAGE: "이것은 메시지입니다. @marco"
+          SLACK_COLOR: "#ffb300"
+          SLACK_MESSAGE: "개발 환경 배포에 실패했습니다. \n@클라"
           SLACK_LINK_NAMES: true
