@@ -2,6 +2,8 @@ import Link from "next/link";
 import { fetchPosts } from "../libs/rest-api/posts";
 
 function HomePage({ posts }) {
+  const foo = null;
+  foo.var;
   return (
     <div>
       <h1>Fucking Welcome Home Page</h1>
