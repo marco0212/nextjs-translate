@@ -13,5 +13,9 @@ jobs:
         uses: rtCamp/action-slack-notify@v2
         env:
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_TITLE: \@marco 안녕하세요.\n코드가 정상적으로 머지 되었습니다.
+          SLACK_USERNAME: 배포에 실패해 슬픈 페페
+          SLACK_ICON_EMOJI: ":sadpepe:"
+          SLACK_COLOR: yellow
+          SLACK_TITLE: 이것은 타이틀입니다.
+          SLACK_MESSAGE: "이것은 메시지입니다. @marco"
           SLACK_LINK_NAMES: true
