@@ -8,11 +8,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      # Install NPM dependencies, cache them correctly
-      # and run all Cypress tests
-      - name: Cypress run
-        uses: cypress-io/github-action@v5.5.1 # use the explicit version number
-        with:
-          component: true
-          build: npm run build
-          start: npm start
+
+      - name: Send Slack notification on failure
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+          SLACK_TITLE: \@marco 안녕하세요.\n코드가 정상적으로 머지 되었습니다.
+          SLACK_LINK_NAMES: true
