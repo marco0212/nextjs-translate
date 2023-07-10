@@ -37,4 +37,193 @@ When a route is loaded with Next.js, the initial HTML is rendered on the server.
 
 서버 컴포넌트로의 전환을 좀 더 쉽게 하기 위해 앱 router 내부의 모든 컴포넌트는 기본적으로 서버 컴포넌트입니다. 이는 적용시키기 위해 따로 처리할 작업이 없으며 훌륭한 퍼포먼스 성능을 성취할 수 있게 합니다. 물론 `'use client'` 지시자를 사용해 클라이언트 컴포넌트를 사용할 수도 있습니다.
 
-https://nextjs.org/docs/getting-started/react-essentials#client-components
+## Client Components
+
+클라이언트 컴포넌트를 사용해 어플리케이션에 클라이언트 사이드의 상호작용을 추가할 수 있다. Next.js에서 이것들은 서버에서 pre-rendered되고 클라이언트에서 hydrated될 것입니다. 클라이언트 컴포넌트를 여태 사용해왔던 page router에서 동작하던 컴포넌트로 생각해도 무방합니다.
+
+### The "use client" directive
+
+"use client" 지시작는 서버 컴포넌트와 클라이언트 컴포넌트 사이 경계를 선언하기 위한 컨벤션이다.
+
+```tsx
+'use client'
+ 
+import { useState } from 'react'
+ 
+export default function Counter() {
+  const [count, setCount] = useState(0)
+ 
+  return (
+    <div>
+      <p>You clicked {count} times</p>
+      <button onClick={() => setCount(count + 1)}>Click me</button>
+    </div>
+  )
+}
+```
+`"use client"`는 서버 컴포넌트 사이 클라이언트 컴포넌트 코드에 자리한다. 이것은 import 문 상단, 파일의 맨 윗 부분에 위치하여 서버 컴포넌트에서 클라이언트 파트의 point를 cut-off 위해 선언된다. 한번 `"use client"`가 선언되면 자식 컴포넌트를 포함해 import되는 모든 모듈은 클라이언트 번들로 여겨진다.
+
+서버 컴포넌트가 기본 동작이기 때문에 `"use client"` 지시자가 없는 모든 컴포넌트들은 서버 컴포넌트이다.
+
+> Good to know
+>
+> - 서버 컴포넌트에 종속되어 있는 컴포넌트들은 서버에서 렌더링이 보장됩니다
+> - 클라이언트에 종속되어 있는 컴포넌트들은 우선적으로 클라이언트에서 렌더링됩니다. 하지만 Next.js에서는 서버에서 pre-rendering이 되고 클라이언트에서 hydration이 진행됩니다
+> - `"use client"`는 import 문 상단에 선언되어야 합니다.
+> - `"use client"`는 모든 파일에서 선언될 필요는 없습니다. 클라이언트 범위의 모둘에서만 한번 선언되면 됩니다. 진입점에서 선언되면 내부 컴포넌트들은 클라이언트 컴포넌트로 간주됩니다.
+
+## When to use Server and Client Components?
+
+서버 컴포넌트와 클라이언트 컴포넌트의 결정을 단순화하려면 클라이언트 컴포넌트의 use case가 존재할 때까지 서버 컴포넌트를 사용하는 것이 권장됩니다.
+
+아래 테이블은 각 컴포넌트들의 use case의 차이점을 요약한 것입니다.
+
+| What do you need to do?                                                    | Server Component | Client Component |
+| -------------------------------------------------------------------------- | ---------------- | ---------------- |
+| Fetch data                                                                 | ✅               | ❌               |
+| Assess backend resources (directly)                                        | ✅               | ❌               |
+| Keep sensitive information on the server (access tokens, API keys, etc)    | ✅               | ❌               |
+| Keep large dependencies on the server / Reduce client-side Javascript      | ✅               | ❌               |
+| Add interactivity and event listener (`onClick()`, `onChange()`, etc)      | ❌               | ✅               |
+| Use State and Lifecycle Effects (`useState()`, `useEffect()`, etc)         | ❌               | ✅               |
+| Use browser-only APIs                                                      | ❌               | ✅               |
+| Use custom hooks that depend on state, effects, or browser-only APIs       | ❌               | ✅               |
+| Use React Class components                                                 | ❌               | ✅               |
+
+## Patterns
+
+### Moving Client Components to the Leaves
+
+어플리케이션의 성능을 향상 시키기 위해서 클라이언트 컴포넌트를 컴포넌트 트리의 최하단으로 이동시키는 것을 권장한다.
+
+예를 들어 정적인 요소와 상호작용을 가진 검색바 컴포넌트를 포함하는 레이아웃 컴포넌트가 있다고 했을 떄, 전체 레이아웃 컴포넌트를 클라이언트 컴포넌트로 만드는 대신에, 상호작용 관련된 로직을 클라이언트 컴포넌트로 이동시키고(e.g. `<SearchBar />`) 레이아웃 컴포넌트는 서버 컴포넌트로 유지하는 방식이다. 이를 통해 모든 컴포넌트의 자바스크립트 번들을 클라이언트로 전달하지 않아도 되게 된다.
+
+```tsx
+// SearchBar is a Client Component
+import SearchBar from './searchbar'
+// Logo is a Server Component
+import Logo from './logo'
+ 
+// Layout is a Server Component by default
+export default function Layout({ children }: { children: React.ReactNode }) {
+  return (
+    <>
+      <nav>
+        <Logo />
+        <SearchBar />
+      </nav>
+      <main>{children}</main>
+    </>
+  )
+}
+```
+
+### Composing Client and Server Components
+
+서버 컴포넌트와 클라이언트 컴포넌트는 같은 컴포넌트 트리에서 조합될 수 있다.
+
+뒷단에서 React는 아래와 같은 순서로 렌더링을 다루게 된다.
+
+- 클라이언트로 결과물을 보내기 이전에 서버에서 React는 모든 서버 컴포넌트를 렌더링한다.
+  - 여기에는 클라이언트 컴포넌트에 중첩되어 있는 서버 컴포넌트들도 모두 포함된다.
+  - 이 과정에서 발생된 클라이언트 컴포넌트는 모두 생략된다.
+- React는 클라이언트에서 서버 컴포넌트의 렌더링된 결과와 클라이언트 컴포넌트 및 슬롯을 렌더링하여 수행된 작업을 모두 병합한다.
+  - 서버 컴포넌트가 클라이언트 컴포넌트 내부에 중첩된 경우 클라이언트 컴포넌트 내에 올바르게 배치된다.
+ 
+> Good to know
+>
+> Next.js에서 초기 페이지 로드 시에 클라이언트와 서버 모두의 결과물은 서버에 의해 pre-render되어 HTML이 된다. 이는 초기 페이지 로드를 더 빠르게 제공한다.
+
+### Nesting Server Components inside Client Components
+
+위에 설명한 렌더링 흐름을 고려할 때 서버 컴포넌트를 클라이언트 컴포넌트로 가져오는 것은 제한이 있습니다. 이런 접근 방식에는 추가 서버 round trip이 필요하기 때문입니다.
+
+```tsx
+'use client'
+ 
+// This pattern will **not** work!
+// You cannot import a Server Component into a Client Component.
+import ExampleServerComponent from './example-server-component'
+ 
+export default function ExampleClientComponent({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [count, setCount] = useState(0)
+ 
+  return (
+    <>
+      <button onClick={() => setCount(count + 1)}>{count}</button>
+ 
+      <ExampleServerComponent />
+    </>
+  )
+}
+```
+
+**권장되는 패턴: 서버 컴포넌트를 클라이언트 컴포넌트의 Prop으로 전달**
+
+클라이언트 컴포넌트를 설계할 때 React Prop을 서버 컴포넌트를 전달하기 위한 slot으로 사용할 수 있다.
+
+서버 컴포넌트는 서버에서 렌더링되고 클라이언트 컴포넌트는 클라이언트에서 렌더링될 때 slot은 서버 컴포넌트의 렌더링된 결과로 채워진다.
+
+일반적으로 children prop을 사용해 slot을 만든다. 위 코드에서는 children prop을 전달 받고 `<ExampleClientComponent />` 컴포넌트를 상위 부모 컴포넌트로 이동시키는 것이다.
+
+```tsx
+'use client'
+ 
+import { useState } from 'react'
+ 
+export default function ExampleClientComponent({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [count, setCount] = useState(0)
+ 
+  return (
+    <>
+      <button onClick={() => setCount(count + 1)}>{count}</button>
+ 
+      {children}
+    </>
+  )
+}
+```
+
+이제 `<ExampleClientComponent />`는 children이 무엇인지 알지 못한다. children이 서버 컴포넌트의 결과물로 채워질 것이라는 사실을 모른다.
+
+`<ExampleClientComponent />` 컴포넌트의 유일한 책임은 자식 컴포넌트가 배치될 위치를 결정하는 것입니다.
+
+서버 컴포넌트에서는 클라이언트 컴포넌트와 서버 컴포넌트를 모두 import할 수 있습니다. 그리고 서버 컴포넌트를 클라이언트 컴포넌트의 자식으로 전달할 수 있습니다.
+
+```tsx
+// This pattern works:
+// You can pass a Server Component as a child or prop of a
+// Client Component.
+import ExampleClientComponent from './example-client-component'
+import ExampleServerComponent from './example-server-component'
+ 
+// Pages in Next.js are Server Components by default
+export default function Page() {
+  return (
+    <ExampleClientComponent>
+      <ExampleServerComponent />
+    </ExampleClientComponent>
+  )
+}
+```
+
+이러한 접근 방식으로 인해 `<ExampleClientComponent />`, `<ExampleServerComponent />`는 디커플될 수 있고 독립적으로 각각의 환경에서 렌더링될 수 있습니다.
+
+> Good to know
+>
+> - 이러한 패턴은 이미 layout과 pages에 적용되어 있기 때문에 추가적인 wrapper 컴포넌트를 만들 필요는 없습니다.
+> - React 컴포넌트를 다른 컴포넌트에게 전달하는 것은 새로운 개념이 아닌 항상 적용되왔던 Composition의 일부입니다.
+> - 이러한 composition 전략은 컴포넌트가 Prop으로 어떤 값을 전달 받을지 알지 못하기 때문에 서버 컴포넌트와 클라이언트 컴포넌트에서 잘 동작합니다. 오직 전달된 것을 어디에 두어야 할지에 대해서만 책임을 가지고 있습니다.
+>   - 이렇게 하면 클라이언트 구성 요소가 클라이언트에서 렌더링되기 훨씬 전에 서버에서 전달된 prop을 독립적으로 렌더링할 수 있습니다.
+>   - The very same strategy of "lifting content up" has been used to avoid state changes in a parent component re-rendering an imported nested child component
+> - prop이 꼭 children이어야 하는 것은 아닙니다. 어떤 prop이든 JSX를 전달할 수 있습니다.
+
+https://nextjs.org/docs/getting-started/react-essentials#passing-props-from-server-to-client-components-serialization
