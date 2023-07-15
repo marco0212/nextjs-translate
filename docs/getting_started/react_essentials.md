@@ -226,4 +226,67 @@ export default function Page() {
 >   - The very same strategy of "lifting content up" has been used to avoid state changes in a parent component re-rendering an imported nested child component
 > - prop이 꼭 children이어야 하는 것은 아닙니다. 어떤 prop이든 JSX를 전달할 수 있습니다.
 
-https://nextjs.org/docs/getting-started/react-essentials#passing-props-from-server-to-client-components-serialization
+### Passing props from server to Client Components (Serialization)
+
+서버 컴포넌트에서 클라이언트 컴포넌트로 전달되는 Prop은 직렬화가 가능해야 한다. 이는 함수, Date와 같은 것들은 클라이언트 컴포넌트로 바로 전달될 수 없음을 의미한다.
+
+> Where is the Network Boundary?
+>
+> App 라우터에서 네트워크 경계는 서버 컴포넌트와 클라이언트 컴포넌트의 사이이다. 이것은 경계가 getStaticProps/getServerSideProps와 페이지 컴포넌트 사이에 있던 것과 다르다. 서버 컴포넌트 내부에서 가져온 데이터는 클라이언트 컴포넌트로 전달되지 않는 한 네트워크 경계를 넘지 않기 때문에 직렬화할 필요가 없다. 서버 컴포넌트를 사용한 데이터 가져오기에 대해 자세히 알아봐라
+
+### Keeping Server-Only Code out of Client Components (Poisoning)
+
+자바스크립트 모듈은 서버 컴포넌트와 클라이언트 컴포넌트 모두에서 공유될 수 있기 때문에 서버에서만 실행되도록 의도된 코드가 클라이언트에 몰래 전달될 수 있다.
+
+예를 들어 아래 코드를 살펴보자.
+
+```tsx
+export async function getData() {
+ const res = await fetch('https://external-service.com/data', {
+  headers: {
+   authorization: process.env.API_KEY 
+  }
+ });
+
+  return res.json();
+}
+```
+
+얼필 보면 getData가 서버와 클라이언트 모두에서 작동하는 것처럼 보인다. 하지만 환경 변수 API_KEY는 NEXT_PUBLIC 접두사가 없기 때문에 서버에서만 접근할 수 있는 비공개 변수다. Next.js는 보안 정보 유출을 방지하기 위해 클라이언트 코드에서 개인 환경 변수를 빈 문자열로 바꾼다.
+
+결과적으로 `getData()`는 클라이언트에서 import되고 호출될 수 있지만 이것은 예상한 대로 동작하지 않는다. 그리고 변수를 공개하면 함수가 클라이언트에서 작성하지만 정보가 유출될 수 있다.
+
+그렇기 때문에 이 함수는 서버에서만 호출되어야 하는 의도로 작성된 코드이다.
+
+### The "Server only" package
+
+위와 같은 의도치 않은 서버 패키지를 클라이언트에서 호출하는 것을 막기 위해 `server-only` 패키지를 사용할 수 있다. 이를 통해 다른 개발자에게 이런 모듈을 클라이언트에서 사용하려고 할 때 빌드 타임에 에러를 줄 수 있다.
+
+server-only를 사용하기 위해 먼저 패키지를 설치해야 한다
+
+```
+npm install server-only
+```
+
+그리곤 패키지를 import한다.
+
+```tsx
+import 'server-only';
+
+export async function getData() {
+ const res = await fetch('https://external-service.com/data', {
+  headers: {
+   authorization: process.env.API_KEY 
+  }
+ });
+
+  return res.json();
+}
+```
+
+이제 `getData()`를 import 한 클라이언트 컴포넌트는 빌드 타임 에러를 전달 받을 수 있다.
+
+`client-only` 패키지는 클라이언트 코드에ㅔ 표시하기 위한 용도로 사용될 수 있다. 예를 들면 window 객체를 사용하는 코드 같은 것에
+
+
+https://nextjs.org/docs/getting-started/react-essentials#data-fetching
