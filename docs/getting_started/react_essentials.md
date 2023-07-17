@@ -371,3 +371,174 @@ export default function Page() {
 ```
 
 아마 대부분의 서드파티 컴포넌트들이 래핑을 필요로 하지 않을 거로 예상합니다. 대부분 그것들은 클라이언트 컴포넌트 내부에서 사용될 것이기 때문입니다. 하지만 예외로 Provider 컴포넌트가 있습니다. 이것은 React의 state와 context에 의존하며 일반적으로 어플리케이션의 root에 있어야 하기 때문입니다.
+
+**Library Authors**
+
+- 비슷하게, 패키지를 만드는 라이브러리 작성자는 잘 사용될 수 있도록 패키지의 진입 포인트에 `"use client"`를 사용해야 한다. 이렇게 해야만 패키지의 사용자는 해당 컴포넌트를 새롭게 래핑할 필요없이 서버 컴포넌트에서 사용할 수 있다.
+- `"use client"` 지시자를 트리에 최대한 깊게 하므로써 import되는 모듈을 서버 컴포넌트의 일부로 불러와 패키지의 최적화를 이를 수 있다.
+- 몇몇 번들러는 `"use client"` 지시자를 제거해버리는데 이것은 주목할 가치가 있습니다. 어떻게 `"use client"`를 포함하도록 esbuild를 설정하는지에 대한 예시는 React Wrap Balancer나 Vercel Analytics 레포지토리에서 찾을 수 있습니다.
+
+## Context
+
+대부분의 React 어플리케이션은 서로 다른 컴포넌트 간 상태를 공유할 수 있도록 context 혹은 createContext에 의존합니다. 혹은 간접적으로 서드파티 라이브러리에 의해 provider 컴포넌트가 사용됩니다.
+
+Next.js 13에서 context는 클라이언트 컴포넌트 내부에서 전적으로 지원됩니다. 하지만 서버 컴포넌트에서는 생성이나 consume이 불가능합니다. 이를 서버 컴포넌트는 React 상태를 가지지 못하기 때문입니다. 그리고 context는 일반적으로 상태가 변경되면 깊숙한 곳에 있는 컴포넌트가 상호작용하여 리렌더링을 유발시킬 때 사용되기 때문입니다.
+
+서버 컴포넌트간의 데이터 공유를 위한 대체제에 대해 설명하려고 합니다. 그전에 클라이언트 컴포넌트에서 어떻게 context를 사용하는지 살펴봅시다.
+
+### Using context in Client Components
+
+클라이언트 컴포넌트에서 Context API는 전적으로 지원됩니다.
+
+```tsx
+'use client'
+ 
+import { createContext, useContext, useState } from 'react'
+ 
+const SidebarContext = createContext()
+ 
+export function Sidebar() {
+  const [isOpen, setIsOpen] = useState()
+ 
+  return (
+    <SidebarContext.Provider value={{ isOpen }}>
+      <SidebarNav />
+    </SidebarContext.Provider>
+  )
+}
+ 
+function SidebarNav() {
+  let { isOpen } = useContext(SidebarContext)
+ 
+  return (
+    <div>
+      <p>Home</p>
+ 
+      {isOpen && <Subnav />}
+    </div>
+  )
+}
+```
+
+그러나 컨텍스트 프로바이더는 글로벌 관심사를 공유하기 위해 일반적으로 어플리케이션의 root 근처에서 렌더됩니다. 서버 컴포넌트에서 컨텍스트는 지원되지 않기 때문에 어플리케이션의 root에서 context를 생성하게 되면 에러를 보게 될 것입니다.
+
+ ```tsx
+ import { createContext } from 'react'
+ 
+//  createContext is not supported in Server Components
+export const ThemeContext = createContext({})
+ 
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <ThemeContext.Provider value="dark">{children}</ThemeContext.Provider>
+      </body>
+    </html>
+  )
+}
+ ```
+
+이를 해결하기 위해서 컨텍스트 생성과 provider 렌더링을 클라이언트 컴포넌트 내부에서 해라.
+
+```tsx
+'use client'
+ 
+import { createContext } from 'react'
+ 
+export const ThemeContext = createContext({})
+ 
+export default function ThemeProvider({ children }) {
+  return <ThemeContext.Provider value="dark">{children}</ThemeContext.Provider>
+}
+```
+
+서버 컴포넌트는 직접적으로 프로바이더를 렌더링할 수 있을 것이다 왜냐하면 프로바이더는 클라이언트 컴포넌트로 표시되어 있으니까.
+
+```tsx
+import ThemeProvider from './theme-provider'
+ 
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  return (
+    <html>
+      <body>
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+root에서 렌더링 되는 provider와 함께면, 앱 전체에 걸친 다른 클라이언트 컴포넌트들은 context를 consume할 수 있게 된다.
+
+> Good to know
+>
+> 프로바이더를 가능한 트리에 깊은 곳에서 렌더링해야 한다. ThemeProvider가 전체 html 문서 대신 children만 래핑하는 방법에 주목해라. 이렇게 하면 Next.js가 서버 컴포넌트의 정적 부분을 더 쉽게 최적화 할 수 있다.
+
+### Rendering third-party context providers in Server Components
+
+서드파티 패키지는 대부분 어플리케이션 root에서 렌더링되어야 하는 프로바이더를 포함하고 있다. 만약 이 프로바이더가 `"use client"`를 포함하고 있다면 이것은 서버 컴포넌트에서 직접적으로 렌더링될 수 있다. 하지만 서버 컴포넌트는 최신 기능이라 많은 서드파티 프로바이더들은 이 지시자가 추가되어 있지 않을 것이다.
+
+만약 `"use client"` 지시자를 포함하지 않는 서드파티 프로바이더를 렌더링하려고 한다면 이것은 에러를 발생시킬 것이다.
+
+```tsx
+import { ThemeProvider } from 'acme-theme'
+ 
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        {/*  Error: `createContext` can't be used in Server Components */}
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
+    </html>
+  )
+}
+```
+
+이를 수정하기 위해서 서드파티 프로바이더를 직접 클라이언트 컴포넌트로 wrap 해줘야 한다.
+
+```tsx
+'use client'
+ 
+import { ThemeProvider } from 'acme-theme'
+import { AuthProvider } from 'acme-auth'
+ 
+export function Providers({ children }) {
+  return (
+    <ThemeProvider>
+      <AuthProvider>{children}</AuthProvider>
+    </ThemeProvider>
+  )
+}
+```
+
+이렇게 하면 `<Provider/>`를 root layout에서 직접 import 할 수 있게 된다.
+
+```tsx
+import { Providers } from './providers'
+ 
+export default function RootLayout({ children }) {
+  return (
+    <html>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
+    </html>
+  )
+}
+```
+
+root에서 렌더링된 프로바이더를 사용하면 모든 컴포넌트와 훅들은 클라이언트 컴포넌트 내부에서 예상대로 동작할 것이다.
+
+서드파티 라이브러리에 `"use client"`가 한번 선언되면 다른 클라이언트 컴포넌트 wrapper를 제거해도 된다.
+
+### Sharing fetch requests between Server Components
+
+데이터를 패치할 때 패치의 결과를 페이지 혹은 레이아웃, 자식 컴포넌트 간에 공유하기를 원할 수 있다. 이것은 컴포넌트간 불필요한 커플링이고 이것은 prop으로 전달하며 이끌어낼 수 있다.
+
+대신 데이터를 소비하는 컴포넌트와 함께 데이터 패치를 함께 배치하는 것을 권장한다. [fetch requests are automatically deduped in Server Components](https://nextjs.org/docs/app/building-your-application/data-fetching#automatic-fetch-request-deduping) 그러므로 각 라우트 세그먼트는 중복되는 요청에 대한 걱정없이 요청될 수 있다. Next.js는 fetch 캐시로 부터 동일한 값을 읽어올 것이다.
