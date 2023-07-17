@@ -288,5 +288,86 @@ export async function getData() {
 
 `client-only` 패키지는 클라이언트 코드에ㅔ 표시하기 위한 용도로 사용될 수 있다. 예를 들면 window 객체를 사용하는 코드 같은 것에
 
+### Data Fetching
 
-https://nextjs.org/docs/getting-started/react-essentials#data-fetching
+물론 클라이언트 컴포넌트에서도 데이터 패치가 가능하지만 클라이언트에서 해야 할 특별한 이유가 없다면 서버 컴포넌트에서 수행하는 것을 권장한다. 데이터 패치를 서버로 이동시키는 것은 성능면에서, 그리고 유저 경험 측면에서 더 좋을 것이다.
+
+[Learn more about data fetching](https://nextjs.org/docs/app/building-your-application/data-fetching)
+
+### Third-party packages
+
+서버 컴포넌트는 최신 기능이기 때문에 서드파티 패키지들은 `useState`, `useEffect`, `createContext`와 같은 클라이언트 전용 기능을 사용하기 위해 `"use client"` 지시자를 추가하기 시작했습니다.
+
+오늘 날, 많은 npm 패키지의 클라이언트 전용 기능을 사용하는 컴포넌트들은 위 지시자를 포함하고 있지 않습니다. 서드 파티 컴포넌트들은 당신이 작성한 클라이언트 컴포넌트 내에서만 정상적으로 동작할 것입니다.
+
+예를 들어 가상의 `<Carousel>` 컴포넌트를 가진 `acme-carousel` 패키지를 설치했다고 가정하겠습니다. 이 컴포넌트는 `useState`를 사용하고 있고 `"use client"` 지시자를 포함하고 있지 않습니다.
+
+만약 `<Carousel>` 컴포넌트를 사용해야 한다면 아래와 같아야 동작할 것 입니다.
+
+```tsx
+'use client'
+ 
+import { useState } from 'react'
+import { Carousel } from 'acme-carousel'
+ 
+export default function Gallery() {
+  let [isOpen, setIsOpen] = useState(false)
+ 
+  return (
+    <div>
+      <button onClick={() => setIsOpen(true)}>View pictures</button>
+ 
+      {/* Works, since Carousel is used within a Client Component */}
+      {isOpen && <Carousel />}
+    </div>
+  )
+}
+```
+
+하지만 서버 컴포넌트에서 직접적으로 사용하려고 한다면 에러를 보게 될 것입니다.
+
+```tsx
+import { Carousel } from 'acme-carousel'
+ 
+export default function Page() {
+  return (
+    <div>
+      <p>View pictures</p>
+ 
+      {/* Error: `useState` can not be used within Server Components */}
+      <Carousel />
+    </div>
+  )
+}
+```
+
+이렇게 동작하는 이유는 Next.js는 `<Carousel />`이 클라이언트 전용 기능을 사용하는지 알지 못하기 때문입니다.
+
+이를 수정하기 위해서 서드파티 컴포넌트를 래핑해서 해결할 수 있습니다.
+
+```tsx
+'use client'
+ 
+import { Carousel } from 'acme-carousel'
+ 
+export default Carousel
+```
+
+이제 `<Carousel />` 컴포넌트를 서버 컴포넌트 내부에서 직접 사용할 수 있습니다.
+
+```tsx
+import Carousel from './carousel'
+ 
+export default function Page() {
+  return (
+    <div>
+      <p>View pictures</p>
+ 
+      {/*  Works, since Carousel is a Client Component */}
+      <Carousel />
+    </div>
+  )
+}
+```
+
+아마 대부분의 서드파티 컴포넌트들이 래핑을 필요로 하지 않을 거로 예상합니다. 대부분 그것들은 클라이언트 컴포넌트 내부에서 사용될 것이기 때문입니다. 하지만 예외로 Provider 컴포넌트가 있습니다. 이것은 React의 state와 context에 의존하며 일반적으로 어플리케이션의 root에 있어야 하기 때문입니다.
